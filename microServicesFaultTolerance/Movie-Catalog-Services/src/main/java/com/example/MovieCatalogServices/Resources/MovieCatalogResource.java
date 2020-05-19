@@ -15,6 +15,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.example.MovieCatalogServices.Model.CatalogItem;
 import com.example.MovieCatalogServices.Model.Movie;
 import com.example.MovieCatalogServices.Model.Rating;
+import com.example.MovieCatalogServices.Model.UserRating;
 
 @RestController
 @RequestMapping("/catalog")
@@ -38,14 +39,18 @@ public class MovieCatalogResource {
 		
 		
 		// hardcoding a list of ratings using arrays
-		List<Rating> ratings = Arrays.asList(
-				 new Rating("1234", 4),
-				 new Rating("5678", 3)
-				);
+//		List<Rating> ratings = Arrays.asList(
+//				 new Rating("1234", 4),
+//				 new Rating("5678", 3)
+//				);
+		
+		// instead of hardcord list we are going to use a rest template 
+		UserRating ratings = restTemplate.getForObject("http://localhost:8083/ratingsdata/users/" + userId, UserRating.class);
+		
 		
 		// looping through arrays
 		// making a call to external api
-		return ratings.stream().map(rating -> {
+		return ratings.getUserRating().stream().map(rating -> {
 			Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
 			
 			
