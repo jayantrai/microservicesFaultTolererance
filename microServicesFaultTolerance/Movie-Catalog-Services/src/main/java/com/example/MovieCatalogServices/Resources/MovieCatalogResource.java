@@ -44,12 +44,14 @@ public class MovieCatalogResource {
 //				 new Rating("5678", 3)
 //				);
 		
+//		IMPORTANT
+		
 		// instead of hardcord list we are going to use a rest template 
 		UserRating ratings = restTemplate.getForObject("http://localhost:8083/ratingsdata/users/" + userId, UserRating.class);
 		
 		
 		// looping through arrays
-		// making a call to external api
+		// making a call to external api which combines ratings and movie info
 		return ratings.getUserRating().stream().map(rating -> {
 			Movie movie = restTemplate.getForObject("http://localhost:8082/movies/" + rating.getMovieId(), Movie.class);
 			

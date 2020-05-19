@@ -29,7 +29,7 @@ public class RatingsResource {
 				);
 				
 		// created an object of new userRating so that it will be easy for us to make changes in the future
-		// instead of returning a list
+		// instead of returning a list, this will also be used to make a call to the api
 		UserRating userRating = new UserRating();
 		userRating.setUserRating(ratings);
 		return userRating;
