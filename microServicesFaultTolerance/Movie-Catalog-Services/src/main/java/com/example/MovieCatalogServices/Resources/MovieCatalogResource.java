@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +17,7 @@ import com.example.MovieCatalogServices.Model.CatalogItem;
 import com.example.MovieCatalogServices.Model.Movie;
 import com.example.MovieCatalogServices.Model.Rating;
 import com.example.MovieCatalogServices.Model.UserRating;
+import com.netflix.discovery.DiscoveryClient;
 
 @RestController
 @RequestMapping("/catalog")
@@ -24,8 +26,6 @@ public class MovieCatalogResource {
 	@Autowired
 	private RestTemplate restTemplate;
 	
-	@Autowired
-	private WebClient.Builder webClientBuilder;
 	
 	
 	@RequestMapping("/{userId}")
@@ -34,9 +34,6 @@ public class MovieCatalogResource {
 //		RestTemplate restTemplate = new RestTemplate();
 		
 //		another method of creating mircoservice calls is webClient.Builder()
-		
-		
-		
 		
 		// hardcoding a list of ratings using arrays
 //		List<Rating> ratings = Arrays.asList(
@@ -47,12 +44,12 @@ public class MovieCatalogResource {
 //		IMPORTANT
 		
 		// instead of hardcord list we are going to use a rest template 
-		UserRating ratings = restTemplate.getForObject("http://ratings-data-service/ratingsdata/users/" + userId, UserRating.class);
+		UserRating userRating = restTemplate.getForObject("http://ratings-data-service/ratingsdata/user/" + userId, UserRating.class);
 		
 		
 		// looping through arrays
 		// making a call to external api which combines ratings and movie info
-		return ratings.getUserRating().stream().map(rating -> {
+		return userRating.getRatings().stream().map(rating -> {
 			Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
 			
 			

@@ -19,7 +19,6 @@ public class Rating {
 		this.rating = rating;
 	}
 	public Rating(String movieId, int rating) {
-		super();
 		this.movieId = movieId;
 		this.rating = rating;
 	}
