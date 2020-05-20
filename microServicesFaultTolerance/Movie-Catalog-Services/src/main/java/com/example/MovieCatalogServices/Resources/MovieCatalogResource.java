@@ -18,6 +18,9 @@ import com.example.MovieCatalogServices.Model.Movie;
 import com.example.MovieCatalogServices.Model.Rating;
 import com.example.MovieCatalogServices.Model.UserRating;
 import com.netflix.discovery.DiscoveryClient;
+import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import com.netflix.ribbon.proxy.annotation.Hystrix;
+//import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 
 @RestController
 @RequestMapping("/catalog")
@@ -29,6 +32,7 @@ public class MovieCatalogResource {
 	
 	
 	@RequestMapping("/{userId}")
+	@HystrixCommand(fallbackMethod = "getFallbackCatalog")
 	public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
 		
 //		RestTemplate restTemplate = new RestTemplate();
@@ -65,11 +69,14 @@ public class MovieCatalogResource {
 		})
 
 		.collect(Collectors.toList());
+	}
 		
 //		return Collections.singletonList(
 //				new CatalogItem("Titanic", "It is a good movie", 4)
 //				);
+		public List<CatalogItem> getFallbackCatalog(@PathVariable("userId") String userId) {
+			return Arrays.asList(new CatalogItem("No Movie", "", 0));
+		}
 		
-		
-	}
+
 }
