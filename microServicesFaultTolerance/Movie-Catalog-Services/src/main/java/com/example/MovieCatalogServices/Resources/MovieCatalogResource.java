@@ -17,6 +17,8 @@ import com.example.MovieCatalogServices.Model.CatalogItem;
 import com.example.MovieCatalogServices.Model.Movie;
 import com.example.MovieCatalogServices.Model.Rating;
 import com.example.MovieCatalogServices.Model.UserRating;
+import com.example.MovieCatalogServices.Services.MovieInfo;
+import com.example.MovieCatalogServices.Services.UserRatingInfo;
 import com.netflix.discovery.DiscoveryClient;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import com.netflix.ribbon.proxy.annotation.Hystrix;
@@ -29,6 +31,11 @@ public class MovieCatalogResource {
 	@Autowired
 	private RestTemplate restTemplate;
 	
+	@Autowired
+	MovieInfo movieInfo;
+	
+	@Autowired
+	UserRatingInfo userRatingInfo;
 	
 	
 	@RequestMapping("/{userId}")
@@ -36,42 +43,42 @@ public class MovieCatalogResource {
 	public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
 		
 
-		UserRating userRating = getUserRating(userId);
+		UserRating userRating = userRatingInfo.getUserRating(userId);
 		
-		return userRating.getRatings().stream().map(rating -> getCatalogItem(rating))
+		return userRating.getRatings().stream().map(rating -> movieInfo.getCatalogItem(rating))
 
 		.collect(Collectors.toList());
 	}
 
 
-	@HystrixCommand(fallbackMethod = "getFallbackCatalogItem")
-	private CatalogItem getCatalogItem(Rating rating) {
-		Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
-
-		return new CatalogItem(movie.getName(), "Making an api call", rating.getRating());
-	}
-
-
-	@HystrixCommand(fallbackMethod = "getFallbackUserRating")
-	private UserRating getUserRating(String userId) {
-		return restTemplate.getForObject("http://ratings-data-service/ratingsdata/user/" + userId, UserRating.class);
-	}
-		
-	private UserRating getFallbackUserRating(@PathVariable("userId") String userId) {
-		UserRating userRating = new UserRating();
-		userRating.setUserId(userId);
-		userRating.setRatings(Arrays.asList(
-				new Rating("0", 0)
-				));
-		return userRating;
-		
-	}
-	
-	
-	private CatalogItem getFallbackCatalogItem(Rating rating) {
-		return new CatalogItem("Movie not found", "", rating.getRating());
-	}
-	
+//	@HystrixCommand(fallbackMethod = "getFallbackCatalogItem")
+//	private CatalogItem getCatalogItem(Rating rating) {
+//		Movie movie = restTemplate.getForObject("http://movie-info-service/movies/" + rating.getMovieId(), Movie.class);
+//
+//		return new CatalogItem(movie.getName(), "Making an api call", rating.getRating());
+//	}
+//
+//
+//	@HystrixCommand(fallbackMethod = "getFallbackUserRating")
+//	private UserRating getUserRating(String userId) {
+//		return restTemplate.getForObject("http://ratings-data-service/ratingsdata/user/" + userId, UserRating.class);
+//	}
+//		
+//	private UserRating getFallbackUserRating(@PathVariable("userId") String userId) {
+//		UserRating userRating = new UserRating();
+//		userRating.setUserId(userId);
+//		userRating.setRatings(Arrays.asList(
+//				new Rating("0", 0)
+//				));
+//		return userRating;
+//		
+//	}
+//	
+//	
+//	private CatalogItem getFallbackCatalogItem(Rating rating) {
+//		return new CatalogItem("Movie not found", "", rating.getRating());
+//	}
+//	
 
 }
 
