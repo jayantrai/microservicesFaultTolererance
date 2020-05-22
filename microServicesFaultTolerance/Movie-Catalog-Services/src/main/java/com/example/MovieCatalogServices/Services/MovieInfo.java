@@ -32,4 +32,5 @@ public class MovieInfo {
 	public CatalogItem getFallbackCatalogItem(Rating rating) {
 		return new CatalogItem("Movie not found", "", rating.getRating());
 	}
+	// project finish
 }
